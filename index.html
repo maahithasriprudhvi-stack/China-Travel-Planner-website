@@ -1,0 +1,1158 @@
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>China Travel Companion - Interactive Guide</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        chinaRed: '#DE2910',
+                        chinaGold: '#FFDE00',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar and aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- Header & Navigation -->
+    <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
+                <div class="bg-chinaRed text-white p-2.5 rounded-xl shadow-lg flex items-center justify-center">
+                    <i class="fa-solid fa-earth-asia text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">ChinaTravel<span class="text-chinaGold">Companion</span></h1>
+                    <p class="text-xs text-slate-400">Your Smart Exploration Guide</p>
+                </div>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
+                <button onclick="switchTab('dashboard')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800" data-target="dashboard">Dashboard</button>
+                <button onclick="switchTab('itinerary')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800" data-target="itinerary">Itineraries</button>
+                <button onclick="switchTab('attractions')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800" data-target="attractions">Attractions</button>
+                <button onclick="switchTab('accommodation')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800" data-target="accommodation">Hotels & Stays</button>
+                <button onclick="switchTab('food')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800" data-target="food">Food & Dining</button>
+                <button onclick="switchTab('toolkit')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800" data-target="toolkit">Toolkit & Tips</button>
+            </nav>
+
+            <!-- Location Selector Trigger -->
+            <div class="flex items-center space-x-3">
+                <button onclick="openLocationModal()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium flex items-center space-x-2 transition shadow-sm">
+                    <i class="fa-solid fa-location-dot text-chinaRed"></i>
+                    <span id="currentLocationDisplay" class="truncate max-w-[120px] sm:max-w-[160px]">Shanghai (The Bund)</span>
+                    <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                </button>
+                <!-- Mobile Menu Toggle -->
+                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-300 hover:text-white p-2">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-slate-800 border-t border-slate-700 px-4 pt-2 pb-4 space-y-1">
+            <button onclick="switchTab('dashboard'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-700">Dashboard</button>
+            <button onclick="switchTab('itinerary'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-700">Itineraries</button>
+            <button onclick="switchTab('attractions'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-700">Attractions</button>
+            <button onclick="switchTab('accommodation'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-700">Hotels & Stays</button>
+            <button onclick="switchTab('food'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-700">Food & Dining</button>
+            <button onclick="switchTab('toolkit'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-white hover:bg-slate-700">Toolkit & Tips</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- 1. DASHBOARD TAB -->
+        <div id="tab-dashboard" class="tab-content fade-in space-y-8">
+            <!-- Hero Banner -->
+            <div class="relative bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl overflow-hidden shadow-2xl text-white p-8 sm:p-12 lg:p-16">
+                <div class="absolute inset-0 opacity-25 mix-blend-overlay bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=1600&q=80')"></div>
+                <div class="relative z-10 max-w-2xl space-y-6">
+                    <span class="inline-flex items-center space-x-2 bg-chinaRed/20 border border-chinaRed/40 text-chinaGold px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase">
+                        <i class="fa-solid fa-compass"></i>
+                        <span id="heroLocationTag">Shanghai Exploration</span>
+                    </span>
+                    <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+                        Discover the Heart of Modern & Ancient China
+                    </h2>
+                    <p class="text-slate-300 text-base sm:text-lg leading-relaxed">
+                        Plan your trip effortlessly with curated itineraries, authentic food picks, interactive transit guides, and essential local toolkits right from your current base.
+                    </p>
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <button onclick="switchTab('itinerary')" class="bg-chinaRed hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition flex items-center space-x-2">
+                            <span>Explore Itineraries</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <button onclick="switchTab('toolkit')" class="bg-slate-800/80 hover:bg-slate-800 text-slate-200 border border-slate-700 font-semibold px-6 py-3 rounded-xl backdrop-blur transition flex items-center space-x-2">
+                            <span>Essential Toolkit</span>
+                            <i class="fa-solid fa-shield-halved text-chinaGold"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats / Highlights -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+                    <div class="bg-red-50 text-chinaRed p-4 rounded-xl">
+                        <i class="fa-solid fa-map-location-dot text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 uppercase">Top Attractions</p>
+                        <h4 class="text-2xl font-bold text-slate-900" id="statAttractionsCount">6+ Places</h4>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+                    <div class="bg-amber-50 text-amber-600 p-4 rounded-xl">
+                        <i class="fa-solid fa-hotel text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 uppercase">Curated Stays</p>
+                        <h4 class="text-2xl font-bold text-slate-900" id="statHotelsCount">5 Hotels</h4>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+                    <div class="bg-emerald-50 text-emerald-600 p-4 rounded-xl">
+                        <i class="fa-solid fa-utensils text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 uppercase">Eateries & Markets</p>
+                        <h4 class="text-2xl font-bold text-slate-900" id="statFoodCount">8 Spots</h4>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
+                    <div class="bg-blue-50 text-blue-600 p-4 rounded-xl">
+                        <i class="fa-solid fa-train-subway text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-slate-500 uppercase">Transport Ease</p>
+                        <h4 class="text-2xl font-bold text-slate-900">Metro & DiDi</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Location Summary & Weather Widget -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+                            <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+                                <i class="fa-solid fa-bullseye text-chinaRed"></i>
+                                <span>Active Destination Profile</span>
+                            </h3>
+                            <button onclick="openLocationModal()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg transition">Change Location</button>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                <p class="text-xs text-slate-500 uppercase font-medium">Selected Location / Landmark</p>
+                                <p class="text-base font-bold text-slate-900 mt-1" id="dashLocationName">Shanghai (The Bund / People's Square)</p>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                <p class="text-xs text-slate-500 uppercase font-medium">Nearest Metro Hub</p>
+                                <p class="text-base font-bold text-slate-900 mt-1" id="dashMetroHub">People's Square Station (Lines 1, 2, 8)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                        <span><i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i> Public transport optimized</span>
+                        <span><i class="fa-solid fa-shield text-indigo-500 mr-1"></i> Verified visitor safety guidelines</span>
+                    </div>
+                </div>
+
+                <!-- Weather & Quick Info Card -->
+                <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-chinaGold">Weather & Climate</span>
+                            <i class="fa-solid fa-cloud-sun text-2xl text-chinaGold"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold" id="weatherCityName">Shanghai</h4>
+                        <div class="flex items-baseline space-x-3 mt-2">
+                            <span class="text-4xl font-extrabold" id="weatherTemp">22°C</span>
+                            <span class="text-sm text-slate-300" id="weatherCondition">Pleasant Breeze</span>
+                        </div>
+                        <p class="text-xs text-slate-300 mt-4 leading-relaxed" id="weatherTip">
+                            Ideal weather for walking along the Bund and exploring classical Chinese gardens. Carry light layers.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-400">
+                        <span>Air Quality: Good</span>
+                        <span>Local Time: GMT+8</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. ITINERARY TAB -->
+        <div id="tab-itinerary" class="tab-content hidden fade-in space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-200 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Customized Itinerary Planner</h2>
+                    <p class="text-slate-500 text-sm">Logically grouped schedules to minimize travel time and maximize discovery.</p>
+                </div>
+                <!-- Duration Switcher Tabs -->
+                <div class="flex bg-slate-200 p-1 rounded-xl">
+                    <button onclick="switchItineraryDuration('1day')" id="itin-btn-1day" class="itin-tab-btn px-4 py-2 rounded-lg text-xs font-bold transition bg-white text-slate-900 shadow-sm">1-Day Plan</button>
+                    <button onclick="switchItineraryDuration('3day')" id="itin-btn-3day" class="itin-tab-btn px-4 py-2 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900">3-Day Plan</button>
+                    <button onclick="switchItineraryDuration('7day')" id="itin-btn-7day" class="itin-tab-btn px-4 py-2 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900">7-Day Master Plan</button>
+                </div>
+            </div>
+
+            <!-- Itinerary Content Container -->
+            <div id="itineraryContainer" class="space-y-6">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+
+        <!-- 3. ATTRACTIONS TAB -->
+        <div id="tab-attractions" class="tab-content hidden fade-in space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-200 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Attractions & Landmarks Explorer</h2>
+                    <p class="text-slate-500 text-sm">Top sights, museums, parks, and temples near your selected location.</p>
+                </div>
+                <!-- Search & Filter -->
+                <div class="flex items-center space-x-2">
+                    <div class="relative">
+                        <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400 text-sm"></i>
+                        <input type="text" id="attractionSearch" oninput="filterAttractions()" placeholder="Search attractions..." class="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-64">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attractions Grid -->
+            <div id="attractionsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+
+        <!-- 4. ACCOMMODATION TAB -->
+        <div id="tab-accommodation" class="tab-content hidden fade-in space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-200 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Accommodation Directory</h2>
+                    <p class="text-slate-500 text-sm">Handpicked hotels, boutique stays, and hostels tailored to every travel style.</p>
+                </div>
+                <!-- Filter Pills -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterHotels('all')" class="hotel-filter-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 text-white transition" data-filter="all">All Stays</button>
+                    <button onclick="filterHotels('Budget')" class="hotel-filter-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition" data-filter="Budget">Budget / Hostel</button>
+                    <button onclick="filterHotels('Family')" class="hotel-filter-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition" data-filter="Family">Family Friendly</button>
+                    <button onclick="filterHotels('Luxury')" class="hotel-filter-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition" data-filter="Luxury">Luxury & Boutique</button>
+                </div>
+            </div>
+
+            <!-- Hotels Grid -->
+            <div id="hotelsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+
+        <!-- 5. FOOD & DINING TAB -->
+        <div id="tab-food" class="tab-content hidden fade-in space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-200 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Restaurants, Cafés & Food Markets</h2>
+                    <p class="text-slate-500 text-sm">Taste authentic local flavors, signature dishes, and vibrant night markets.</p>
+                </div>
+                <!-- Dietary Filter -->
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs font-medium text-slate-500">Dietary:</span>
+                    <select id="dietaryFilter" onchange="filterFood()" class="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="all">All Options</option>
+                        <option value="vegetarian">Vegetarian Friendly</option>
+                        <option value="halal">Halal Options Available</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Food Grid -->
+            <div id="foodGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+
+        <!-- 6. TOOLKIT & TIPS TAB -->
+        <div id="tab-toolkit" class="tab-content hidden fade-in space-y-6">
+            <div class="pb-4 border-b border-slate-200">
+                <h2 class="text-2xl font-bold text-slate-900">Practical Travel Toolkit & Survival Guide</h2>
+                <p class="text-slate-500 text-sm">Essential apps, payment setup, emergency numbers, and key Chinese phrases.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Essential Apps & Payments -->
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-100 space-y-6">
+                    <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+                        <i class="fa-solid fa-mobile-screen-button text-chinaRed"></i>
+                        <span>Digital Payments & Navigation Apps</span>
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
+                            <div class="bg-blue-600 text-white p-3 rounded-xl"><i class="fa-solid fa-wallet text-xl"></i></div>
+                            <div>
+                                <h4 class="font-bold text-slate-900">Alipay & WeChat Pay</h4>
+                                <p class="text-xs text-slate-600 mt-1">Almost everywhere in China is cashless. Download Alipay or WeChat before arrival and link your international Visa/Mastercard for seamless QR code payments at street stalls, taxis, and high-end restaurants.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
+                            <div class="bg-orange-600 text-white p-3 rounded-xl"><i class="fa-solid fa-taxi text-xl"></i></div>
+                            <div>
+                                <h4 class="font-bold text-slate-900">DiDi (Ride Hailing)</h4>
+                                <p class="text-xs text-slate-600 mt-1">China's equivalent to Uber. Available in English via the Alipay mini-program or standalone app. Essential for getting around without speaking fluent Mandarin.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
+                            <div class="bg-emerald-600 text-white p-3 rounded-xl"><i class="fa-solid fa-sim-card text-xl"></i></div>
+                            <div>
+                                <h4 class="font-bold text-slate-900">SIM / eSIM & VPN Note</h4>
+                                <p class="text-xs text-slate-600 mt-1">Buy a roaming eSIM (like Airalo or Holafly) before you arrive to bypass internet restrictions for Google, WhatsApp, and Instagram. Alternatively, subscribe to a reliable roaming plan.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Contacts & Medical -->
+                <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-100 space-y-6">
+                    <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+                        <i class="fa-solid fa-kit-medical text-chinaRed"></i>
+                        <span>Emergency Contacts & Safety</span>
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-red-50 p-4 rounded-xl border border-red-100 text-center">
+                            <span class="text-xs font-semibold text-red-600 uppercase">Police Emergency</span>
+                            <h4 class="text-3xl font-extrabold text-red-700 mt-1">110</h4>
+                        </div>
+                        <div class="bg-amber-50 p-4 rounded-xl border border-amber-100 text-center">
+                            <span class="text-xs font-semibold text-amber-600 uppercase">Ambulance</span>
+                            <h4 class="text-3xl font-extrabold text-amber-700 mt-1">120</h4>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 text-center">
+                            <span class="text-xs font-semibold text-blue-600 uppercase">Fire Brigade</span>
+                            <h4 class="text-3xl font-extrabold text-blue-700 mt-1">119</h4>
+                        </div>
+                        <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100 text-center">
+                            <span class="text-xs font-semibold text-emerald-600 uppercase">Traffic Accident</span>
+                            <h4 class="text-3xl font-extrabold text-emerald-700 mt-1">122</h4>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <h4 class="font-bold text-slate-900 text-sm mb-1"><i class="fa-solid fa-hospital text-indigo-600 mr-2"></i>Recommended Expat Hospitals</h4>
+                        <p class="text-xs text-slate-600">Shanghai United Family Hospital, Beijing United Family Hospital, or International SOS Clinic. Keep travel insurance details handy.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Essential Chinese Phrases Section -->
+            <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-100 space-y-6">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+                    <i class="fa-solid fa-language text-chinaRed"></i>
+                    <span>Essential Mandarin Survival Phrases</span>
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="phraseContainer">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 mt-12 py-8 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+            <p>&copy; 2026 China Travel Companion. Designed for immersive exploration.</p>
+            <div class="flex space-x-6">
+                <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition">Travel Advisories</a>
+                <a href="#" class="hover:text-white transition">Contact Support</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LOCATION SETUP MODAL -->
+    <div id="locationModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-6 fade-in">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold text-slate-900 flex items-center space-x-2">
+                    <i class="fa-solid fa-location-crosshairs text-chinaRed"></i>
+                    <span>Set Your Base Location</span>
+                </h3>
+                <button onclick="closeLocationModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-600">
+                Enter your city, neighborhood, or nearest landmark to personalize your distance calculations, transport routes, and recommendations.
+            </p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Select Preset City / Landmark</label>
+                    <select id="presetLocationSelect" onchange="applyPresetLocation()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-chinaRed">
+                        <option value="Shanghai (The Bund)">Shanghai (The Bund / People's Square)</option>
+                        <option value="Beijing (Forbidden City)">Beijing (Forbidden City / Wangfujing)</option>
+                        <option value="Xi'an (Bell Tower)">Xi'an (Bell Tower / Muslim Quarter)</option>
+                        <option value="Chengdu (Tianfu Square)">Chengdu (Tianfu Square / Chunxi Road)</option>
+                        <option value="Guilin (Elephant Trunk Hill)">Guilin (Elephant Trunk Hill / City Center)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Or Enter Custom Address / Landmark</label>
+                    <input type="text" id="customLocationInput" placeholder="e.g. French Concession, Shanghai" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-chinaRed">
+                </div>
+            </div>
+            <div class="flex space-x-3 pt-2">
+                <button onclick="closeLocationModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl text-sm transition">Cancel</button>
+                <button onclick="saveLocation()" class="flex-1 bg-chinaRed hover:bg-red-700 text-white font-semibold py-3 rounded-xl text-sm transition shadow-md">Update Guide</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM NOTIFICATION TOAST -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-xl flex items-center space-x-3 text-sm">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toastMessage">Action completed successfully!</span>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Data Store for Cities & Profiles
+        const cityDataStore = {
+            "Shanghai (The Bund)": {
+                cityName: "Shanghai",
+                heroTag: "Shanghai Exploration",
+                metroHub: "People's Square Station (Lines 1, 2, 8)",
+                weatherTemp: "21°C",
+                weatherCondition: "Pleasant Breeze",
+                weatherTip: "Ideal weather for walking along the Bund and exploring classical Chinese gardens.",
+                attractions: [
+                    {
+                        name: "The Bund (Wai Tan)",
+                        category: "Landmark & Viewpoint",
+                        distance: "0.8 km",
+                        travelTime: "10 mins walk",
+                        hours: "Open 24 hours",
+                        price: "Free",
+                        image: "https://images.unsplash.com/photo-1548919973-5155f582f2c0?auto=format&fit=crop&w=800&q=80",
+                        worth: "Iconic waterfront promenade featuring magnificent colonial-era architecture and views of Pudong's futuristic skyline.",
+                        bus: "Bus No. 33, 55, 65 to Zhongshan East 1st Rd",
+                        metro: "East Nanjing Road Station (Lines 2 & 10)"
+                    },
+                    {
+                        name: "Yu Garden & Bazaar",
+                        category: "Temple & Culture",
+                        distance: "1.5 km",
+                        travelTime: "15 mins bus / 20 mins walk",
+                        hours: "8:30 AM – 5:30 PM",
+                        price: "¥40 (~$6 USD)",
+                        image: "https://images.unsplash.com/photo-1578922718764-58a43689b17a?auto=format&fit=crop&w=800&q=80",
+                        worth: "Exquisite classical Ming Dynasty garden with delicate rockeries, koi ponds, and bustling traditional shopping alleyways.",
+                        bus: "Bus No. 11, 64, 736 to Yuyuan Station",
+                        metro: "Yuyuan Garden Station (Line 10)"
+                    },
+                    {
+                        name: "Shanghai Tower",
+                        category: "Landmark & Viewpoint",
+                        distance: "3.2 km",
+                        travelTime: "20 mins via Metro Line 2",
+                        hours: "8:30 AM – 10:00 PM",
+                        price: "¥180 (~$25 USD)",
+                        image: "https://images.unsplash.com/photo-1506665531195-3566af2b4dfa?auto=format&fit=crop&w=800&q=80",
+                        worth: "Second-tallest building in the world offering breathtaking panoramic views from the 118th-floor observation deck.",
+                        bus: "Bus No. 82, 314, 583 to Lujiazui Ring Rd",
+                        metro: "Lujiazui Station (Line 2)"
+                    },
+                    {
+                        name: "Shanghai Museum",
+                        category: "Museum",
+                        distance: "1.0 km",
+                        travelTime: "12 mins walk",
+                        hours: "9:00 AM – 5:00 PM (Closed Mondays)",
+                        price: "Free (Reservation Required)",
+                        image: "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=800&q=80",
+                        worth: "World-class museum housing massive collections of ancient Chinese bronze, ceramics, calligraphy, and jade artifacts.",
+                        bus: "Bus No. 18, 46, 71 to People's Square",
+                        metro: "People's Square Station (Lines 1, 2, 8)"
+                    },
+                    {
+                        name: "French Concession",
+                        category: "Park & Neighborhood",
+                        distance: "2.5 km",
+                        travelTime: "15 mins by Metro",
+                        hours: "Open 24 hours",
+                        price: "Free",
+                        image: "https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=800&q=80",
+                        worth: "Charming tree-lined streets, European-style villas, trendy boutiques, and cozy indie coffee shops.",
+                        bus: "Bus No. 26, 42, 167 to Fuxing Rd",
+                        metro: "South Shaanxi Road Station (Lines 1, 10, 12)"
+                    },
+                    {
+                        name: "Jade Buddha Temple",
+                        category: "Temple",
+                        distance: "4.0 km",
+                        travelTime: "25 mins by Metro",
+                        hours: "8:00 AM – 4:30 PM",
+                        price: "¥20 (~$3 USD)",
+                        image: "https://images.unsplash.com/photo-1541427422271-185cf15b2e93?auto=format&fit=crop&w=800&q=80",
+                        worth: "Active Buddhist temple famous for two magnificent white jade Buddha statues brought from Burma.",
+                        bus: "Bus No. 19, 206, 738 to Anyuan Rd",
+                        metro: "Jiangning Road Station (Line 13)"
+                    }
+                ],
+                hotels: [
+                    {
+                        name: "The Peninsula Shanghai",
+                        type: "Luxury",
+                        price: "¥2,800 - ¥4,500 / night",
+                        location: "Near The Bund (0.3 km)",
+                        amenities: "Indoor pool, rooftop bar, spa, Michelin dining",
+                        suitability: "Luxury travelers seeking heritage elegance",
+                        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80"
+                    },
+                    {
+                        name: "Radisson Blu Hotel Shanghai New World",
+                        type: "Family",
+                        price: "¥900 - ¥1,500 / night",
+                        location: "People's Square (0.5 km)",
+                        amenities: "Revolving restaurant, indoor pool, family suites",
+                        suitability: "Families & first-time visitors wanting central access",
+                        image: "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=800&q=80"
+                    },
+                    {
+                        name: "URBN Shanghai Boutique Hotel",
+                        type: "Luxury",
+                        price: "¥1,200 - ¥2,000 / night",
+                        location: "Jing'an District (1.8 km)",
+                        amenities: "Eco-friendly design, courtyard lounge, craft bar",
+                        suitability: "Couples & boutique design enthusiasts",
+                        image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80"
+                    },
+                    {
+                        name: "Shanghai Chi-Q Hostel",
+                        type: "Budget",
+                        price: "¥180 - ¥450 / night",
+                        location: "Near People's Square (1.0 km)",
+                        amenities: "Free Wi-Fi, social terrace, laundry, lockers",
+                        suitability: "Solo travelers & backpackers on a budget",
+                        image: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80"
+                    },
+                    {
+                        name: "SSAW Boutique Hotel Shanghai Bund",
+                        type: "Family",
+                        price: "¥700 - ¥1,100 / night",
+                        location: "Yu Garden Area (0.6 km)",
+                        amenities: "Modern styling, breakfast buffet, helpful concierge",
+                        suitability: "Travelers seeking comfort close to historic sights",
+                        image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=800&q=80"
+                    }
+                ],
+                food: [
+                    {
+                        name: "Jia Jia Tang Bao",
+                        cuisine: "Local Shanghainese Dim Sum",
+                        dishes: "Crab Roe & Pork Soup Dumplings (Xiao Long Bao)",
+                        cost: "¥50 - ¥80 per person",
+                        dietary: "vegetarian",
+                        distance: "0.9 km",
+                        image: "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=800&q=80",
+                        description: "Legendary spot for freshly hand-rolled soup dumplings bursting with savory broth."
+                    },
+                    {
+                        name: "Old Shanghai Restaurant",
+                        cuisine: "Traditional Shanghainese",
+                        dishes: "Hong Shao Rou (Braised Pork Belly), Squirrel Mandarin Fish",
+                        cost: "¥150 - ¥250 per person",
+                        dietary: "vegetarian",
+                        distance: "1.2 km",
+                        image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80",
+                        description: "Classic dining hall serving heirloom local banquet dishes in vintage 1930s decor."
+                    },
+                    {
+                        name: "Ultraviolet by Paul Pairet",
+                        cuisine: "Avant-Garde Experimental",
+                        dishes: "Multi-sensory 20-course immersive dinner",
+                        cost: "¥4,000+ per person",
+                        dietary: "halal",
+                        distance: "4.5 km",
+                        image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80",
+                        description: "World-famous single-table dining experience combining food with light, sound, and projection."
+                    },
+                    {
+                        name: "Yunnan Jade Bamboo Restaurant",
+                        cuisine: "Regional Southwestern",
+                        dishes: "Mint Beef Salad, Wild Mushroom Hotpot",
+                        cost: "¥90 - ¥140 per person",
+                        dietary: "vegetarian",
+                        distance: "2.1 km",
+                        image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80",
+                        description: "Fragrant herbs and unique organic ingredients sourced directly from Yunnan mountains."
+                    },
+                    {
+                        name: "Shaanxi Road Night Food Stalls",
+                        cuisine: "Street Food Market",
+                        dishes: "Jianbing (Chinese Crepe), Scallion Oil Noodles",
+                        cost: "¥20 - ¥40 per person",
+                        dietary: "vegetarian",
+                        distance: "1.8 km",
+                        image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80",
+                        description: "Vibrant night food cluster offering quick bites and authentic local delicacies."
+                    },
+                    {
+                        name: "Lost Heaven on the Bund",
+                        cuisine: "Yunnan Ethnic Minority",
+                        dishes: "Spicy Burmese Tea Leaf Salad, Dali Grilled Fish",
+                        cost: "¥180 - ¥280 per person",
+                        dietary: "halal",
+                        distance: "0.5 km",
+                        image: "https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=800&q=80",
+                        description: "Stunning ethnic-themed restaurant overlooking the Bund with rich aromatic spices."
+                    }
+                ],
+                itineraries: {
+                    "1day": [
+                        {
+                            time: "Morning (9:00 AM - 12:30 PM)",
+                            title: "Historic Roots & Classical Gardens",
+                            details: "Start at Yu Garden and the bustling Yuyuan Bazaar. Stroll through 400-year-old pavilions, zigzag bridges, and exquisite rock gardens. Grab freshly baked flaky pastries.",
+                            transport: "Take Metro Line 10 to Yuyuan Garden Station.",
+                            cost: "¥40 entry + ¥30 snacks"
+                        },
+                        {
+                            time: "Afternoon (1:30 PM - 5:00 PM)",
+                            title: "Culture & Waterfront Walk",
+                            details: "Visit the Shanghai Museum in People's Square to marvel at ancient bronze and jade. Afterwards, take a leisurely 15-minute walk or short bus ride to The Bund.",
+                            transport: "Walk or take Metro Line 2 to East Nanjing Road.",
+                            cost: "Free museum entry (Book online)"
+                        },
+                        {
+                            time: "Evening (6:00 PM - 9:30 PM)",
+                            title: "Skyline Lights & River Cruise",
+                            details: "Dine at a Bund rooftop restaurant overlooking Pudong's neon skyscrapers. Take a 45-minute Huangpu River cruise to witness the dazzling night illumination.",
+                            transport: "Walking along The Bund promenade; Ferry across river.",
+                            cost: "¥150 cruise + ¥200 dinner"
+                        }
+                    ],
+                    "3day": [
+                        {
+                            time: "Day 1: Classic Shanghai",
+                            title: "Yu Garden, The Bund & Huangpu Cruise",
+                            details: "Morning at Yu Garden & Bazaar, afternoon at Shanghai Museum & East Nanjing Road pedestrian walk, evening river cruise and skyline dining.",
+                            transport: "Metro Lines 2 & 10, walking.",
+                            cost: "Approx. ¥450 total"
+                        },
+                        {
+                            time: "Day 2: Modern Heights & French Concession",
+                            title: "Pudong Skyscrapers & Tree-lined Boulevards",
+                            details: "Morning ascending Shanghai Tower in Lujiazui. Afternoon exploring the romantic French Concession tree-lined streets and indie coffee shops.",
+                            transport: "Metro Line 2 across the river, DiDi taxi between districts.",
+                            cost: "¥180 tower ticket + ¥250 meals/coffee"
+                        },
+                        {
+                            time: "Day 3: Temples & Ancient Water Towns",
+                            title: "Jade Buddha Temple & Zhujiajiao Canal Town",
+                            details: "Morning visit to the serene Jade Buddha Temple. Afternoon half-day trip to Zhujiajiao ancient water town with stone bridges and boat rides.",
+                            transport: "Metro Line 13 to Jade Buddha; Metro Line 17 to Zhujiajiao.",
+                            cost: "¥20 temple + ¥60 water town boat"
+                        }
+                    ],
+                    "7day": [
+                        {
+                            time: "Days 1 - 2",
+                            title: "City Core & Skyline Mastery",
+                            details: "Deep dive into Yu Garden, The Bund, Shanghai Museum, Lujiazui towers (Shanghai Tower & Oriental Pearl), and French Concession walking tours.",
+                            transport: "Metro 3-Day Pass (¥45) & DiDi rides.",
+                            cost: "Approx. ¥800"
+                        },
+                        {
+                            time: "Days 3 - 4",
+                            title: "Arts, Temples & Culinary Trails",
+                            details: "Jade Buddha Temple, M50 Creative Arts Park, Tianzifang artisan alleyways, Nanjing Road shopping, and dim sum cooking masterclass.",
+                            transport: "Metro & Walking.",
+                            cost: "Approx. ¥700"
+                        },
+                        {
+                            time: "Days 5 - 6",
+                            title: "Water Towns & Day Trips",
+                            details: "Excursions to Zhouzhuang or Zhujiajiao water towns. Day trip to nearby Suzhou classical gardens (UNESCO World Heritage site via 30-min high-speed train).",
+                            transport: "High-speed rail (approx. ¥40 one way) + local buses.",
+                            cost: "Approx. ¥500"
+                        },
+                        {
+                            time: "Day 7",
+                            title: "Relaxed Departure & Souvenir Hunt",
+                            details: "Morning tea ceremony experience, souvenir shopping at Xintiandi, and Maglev high-speed train ride to Pudong Airport (reaching 430 km/h).",
+                            transport: "Maglev Train (¥50 with flight ticket).",
+                            cost: "Approx. ¥300"
+                        }
+                    ]
+                }
+            },
+            "Beijing (Forbidden City)": {
+                cityName: "Beijing",
+                heroTag: "Imperial Beijing",
+                metroHub: "Tian'anmen East Station (Line 1)",
+                weatherTemp: "19°C",
+                weatherCondition: "Clear & Crisp",
+                weatherTip: "Perfect weather for exploring ancient imperial palaces and courtyard hutongs.",
+                attractions: [
+                    {
+                        name: "The Forbidden City",
+                        category: "Landmark & Museum",
+                        distance: "0.5 km",
+                        travelTime: "5 mins walk",
+                        hours: "8:30 AM – 5:00 PM (Closed Mondays)",
+                        price: "¥60 (~$9 USD)",
+                        image: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=800&q=80",
+                        worth: "Stunning imperial palace complex of 980 buildings spanning 500 years of Ming and Qing dynasties.",
+                        bus: "Bus No. 1, 2, 52 to Tian'anmen East",
+                        metro: "Tian'anmen East Station (Line 1)"
+                    },
+                    {
+                        name: "Temple of Heaven",
+                        category: "Temple & Park",
+                        distance: "3.5 km",
+                        travelTime: "20 mins by Metro Line 5",
+                        hours: "6:00 AM – 10:00 PM",
+                        price: "¥34 (~$5 USD)",
+                        image: "https://images.unsplash.com/photo-1547989451-34323c963fb0?auto=format&fit=crop&w=800&q=80",
+                        worth: "Masterpiece of imperial architecture where Ming and Qing emperors prayed for bountiful harvests.",
+                        bus: "Bus No. 6, 34, 36 to Tiantan",
+                        metro: "Tiantandongmen Station (Line 5)"
+                    },
+                    {
+                        name: "Summer Palace",
+                        category: "Park & Landmark",
+                        distance: "12 km",
+                        travelTime: "35 mins by Metro Line 4",
+                        hours: "6:30 AM – 6:00 PM",
+                        price: "¥30 (~$4 USD)",
+                        image: "https://images.unsplash.com/photo-1570789210967-2cac24afeb00?auto=format&fit=crop&w=800&q=80",
+                        worth: "Vast imperial garden featuring Kunming Lake, Longevity Hill, and the ornate Long Corridor.",
+                        bus: "Bus No. 332, 346 to Yiheyuan",
+                        metro: "Beigongmen Station (Line 4)"
+                    }
+                ],
+                hotels: [
+                    {
+                        name: "The Opposite House",
+                        type: "Luxury",
+                        price: "¥2,500 - ¥4,000 / night",
+                        location: "Sanlitun (4.0 km)",
+                        amenities: "Contemporary art gallery design, indoor pool",
+                        suitability: "Design enthusiasts & luxury travelers",
+                        image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80"
+                    },
+                    {
+                        name: "Beijing Downtown Backpackers",
+                        type: "Budget",
+                        price: "¥160 - ¥380 / night",
+                        location: "Nanluoguxiang Hutong (1.5 km)",
+                        amenities: "Traditional courtyard setting, rooftop terrace",
+                        suitability: "Backpackers & solo cultural explorers",
+                        image: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80"
+                    }
+                ],
+                food: [
+                    {
+                        name: "Siji Minfu Roast Duck",
+                        cuisine: "Imperial Beijing Cuisine",
+                        dishes: "Peking Duck with Crispy Skin & Thin Pancakes",
+                        cost: "¥150 - ¥250 per person",
+                        dietary: "vegetarian",
+                        distance: "1.0 km",
+                        image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80",
+                        description: "Widely regarded as serving the juiciest Peking duck with traditional condiments."
+                    }
+                ],
+                itineraries: {
+                    "1day": [
+                        {
+                            time: "Morning",
+                            title: "Tian'anmen Square & Forbidden City",
+                            details: "Explore the vast Tian'anmen Square followed by a 3-hour journey through the imperial halls of the Forbidden City.",
+                            transport: "Metro Line 1.",
+                            cost: "¥60 entry"
+                        },
+                        {
+                            time: "Afternoon",
+                            title: "Jingshan Park & Hutong Rickshaw Ride",
+                            details: "Climb Jingshan Hill for a panoramic overview of the Forbidden City rooftops. Take a rickshaw tour through ancient Beijing hutongs.",
+                            transport: "Walking across street from North Gate.",
+                            cost: "¥2 park + ¥100 rickshaw"
+                        },
+                        {
+                            time: "Evening",
+                            title: "Peking Duck Feast",
+                            details: "Savor a traditional crispy Peking duck dinner paired with plum sauce and scallions.",
+                            transport: "Taxi or Metro.",
+                            cost: "¥200 dinner"
+                        }
+                    ],
+                    "3day": [
+                        {
+                            time: "Day 1",
+                            title: "Imperial Core",
+                            details: "Tian'anmen, Forbidden City, Jingshan Park, and Wangfujing night market.",
+                            transport: "Metro Line 1.",
+                            cost: "¥350 total"
+                        },
+                        {
+                            time: "Day 2",
+                            title: "Great Wall of China (Mutianyu Section)",
+                            details: "Full day excursion to the majestic Mutianyu Great Wall with cable car up and toboggan ride down.",
+                            transport: "Tour bus or private transfer.",
+                            cost: "¥400 total"
+                        },
+                        {
+                            time: "Day 3",
+                            title: "Temple of Heaven & Summer Palace",
+                            details: "Morning prayer altars at Temple of Heaven, afternoon boat ride on Kunming Lake at Summer Palace.",
+                            transport: "Metro Lines 5 & 4.",
+                            cost: "¥100 total"
+                        }
+                    ],
+                    "7day": [
+                        {
+                            time: "Days 1 - 7",
+                            title: "Comprehensive Imperial & Modern Journey",
+                            details: "Forbidden City, Great Wall (Mutianyu & Badaling), Summer Palace, Temple of Heaven, Lama Temple, 798 Art District, and Hutong culinary tours.",
+                            transport: "Metro & Chartered Transfers.",
+                            cost: "Approx. ¥3,500"
+                        }
+                    ]
+                }
+            }
+        };
+
+        // Active state
+        let currentCityKey = "Shanghai (The Bund)";
+        let activeTab = "dashboard";
+        let activeItinDuration = "1day";
+        let activeHotelFilter = "all";
+
+        // Initialization on Load
+        window.onload = function() {
+            renderDashboard();
+            renderPhrases();
+            updateActiveNav();
+        };
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            activeTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            
+            updateActiveNav();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Trigger render for specific tabs if needed
+            if (tabId === 'itinerary') renderItinerary();
+            if (tabId === 'attractions') renderAttractions();
+            if (tabId === 'accommodation') renderHotels();
+            if (tabId === 'food') renderFood();
+        }
+
+        function updateActiveNav() {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.dataset.target === activeTab) {
+                    btn.classList.add('bg-slate-800', 'text-white');
+                    btn.classList.remove('text-slate-300');
+                } else {
+                    btn.classList.remove('bg-slate-800', 'text-white');
+                    btn.classList.add('text-slate-300');
+                }
+            });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Location Modal Controls
+        function openLocationModal() {
+            document.getElementById('locationModal').classList.remove('hidden');
+            document.getElementById('locationModal').classList.add('flex');
+        }
+
+        function closeLocationModal() {
+            document.getElementById('locationModal').classList.add('hidden');
+            document.getElementById('locationModal').classList.remove('flex');
+        }
+
+        function applyPresetLocation() {
+            const sel = document.getElementById('presetLocationSelect').value;
+            document.getElementById('customLocationInput').value = sel;
+        }
+
+        function saveLocation() {
+            const customVal = document.getElementById('customLocationInput').value.trim();
+            const presetVal = document.getElementById('presetLocationSelect').value;
+            const chosen = customVal || presetVal;
+
+            if (cityDataStore[chosen]) {
+                currentCityKey = chosen;
+            } else {
+                // Default fallback if custom doesn't exist in deep store, assign Shanghai template
+                currentCityKey = "Shanghai (The Bund)";
+            }
+
+            document.getElementById('currentLocationDisplay').innerText = chosen;
+            closeLocationModal();
+            renderDashboard();
+            showToast(`Location updated to ${chosen}`);
+        }
+
+        // Render Dashboard
+        function renderDashboard() {
+            const data = cityDataStore[currentCityKey] || cityDataStore["Shanghai (The Bund)"];
+            document.getElementById('heroLocationTag').innerText = data.heroTag;
+            document.getElementById('dashLocationName').innerText = currentCityKey;
+            document.getElementById('dashMetroHub').innerText = data.metroHub;
+            document.getElementById('weatherCityName').innerText = data.cityName;
+            document.getElementById('weatherTemp').innerText = data.weatherTemp;
+            document.getElementById('weatherCondition').innerText = data.weatherCondition;
+            document.getElementById('weatherTip').innerText = data.weatherTip;
+            document.getElementById('statAttractionsCount').innerText = `${data.attractions.length}+ Places`;
+            document.getElementById('statHotelsCount').innerText = `${data.hotels.length} Hotels`;
+            document.getElementById('statFoodCount').innerText = `${data.food.length} Spots`;
+        }
+
+        // Render Itinerary
+        function switchItineraryDuration(duration) {
+            activeItinDuration = duration;
+            document.querySelectorAll('.itin-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
+                btn.classList.add('text-slate-600');
+            });
+            document.getElementById(`itin-btn-${duration}`).classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+            document.getElementById(`itin-btn-${duration}`).classList.remove('text-slate-600');
+            renderItinerary();
+        }
+
+        function renderItinerary() {
+            const data = cityDataStore[currentCityKey] || cityDataStore["Shanghai (The Bund)"];
+            const plan = data.itineraries[activeItinDuration] || data.itineraries["1day"];
+            const container = document.getElementById('itineraryContainer');
+            
+            container.innerHTML = plan.map((item, idx) => `
+                <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100 flex flex-col md:flex-row gap-6 items-start">
+                    <div class="bg-red-50 text-chinaRed font-extrabold px-4 py-3 rounded-xl text-center min-w-[140px]">
+                        <span class="block text-xs uppercase text-slate-500 font-semibold">Phase ${idx + 1}</span>
+                        <span class="text-sm mt-1 block">${item.time}</span>
+                    </div>
+                    <div class="flex-grow space-y-3">
+                        <h3 class="text-xl font-bold text-slate-900">${item.title}</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">${item.details}</p>
+                        <div class="flex flex-wrap gap-4 pt-2 text-xs text-slate-500 border-t border-slate-100 mt-4">
+                            <span><i class="fa-solid fa-train-subway text-indigo-600 mr-1"></i> ${item.transport}</span>
+                            <span><i class="fa-solid fa-ticket text-emerald-600 mr-1"></i> Est. Cost: ${item.cost}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Attractions
+        function renderAttractions() {
+            const data = cityDataStore[currentCityKey] || cityDataStore["Shanghai (The Bund)"];
+            const query = document.getElementById('attractionSearch').value.toLowerCase();
+            const filtered = data.attractions.filter(a => a.name.toLowerCase().includes(query) || a.category.toLowerCase().includes(query));
+            const grid = document.getElementById('attractionsGrid');
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-center text-slate-400 py-12">No attractions found matching your search.</p>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(attr => `
+                <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between transition hover:shadow-md">
+                    <div>
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="${attr.image}" alt="${attr.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/1e293b/ffffff?text=Attraction'">
+                            <span class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur text-white text-xs font-semibold px-3 py-1 rounded-full">${attr.category}</span>
+                            <span class="absolute top-3 right-3 bg-chinaRed text-white text-xs font-bold px-3 py-1 rounded-full">${attr.price}</span>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <h3 class="text-lg font-bold text-slate-900">${attr.name}</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">${attr.worth}</p>
+                            <div class="space-y-1.5 text-xs text-slate-500 pt-2 border-t border-slate-100">
+                                <p><i class="fa-solid fa-location-arrow text-indigo-600 mr-1.5"></i> Distance: ${attr.distance} (${attr.travelTime})</p>
+                                <p><i class="fa-solid fa-clock text-amber-600 mr-1.5"></i> Hours: ${attr.hours}</p>
+                                <p><i class="fa-solid fa-bus text-emerald-600 mr-1.5"></i> Bus: ${attr.bus}</p>
+                                <p><i class="fa-solid fa-train text-blue-600 mr-1.5"></i> Metro: ${attr.metro}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0">
+                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(attr.name + ' ' + currentCityKey)}" target="_blank" class="block w-full text-center bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2.5 rounded-xl text-xs transition">
+                            <i class="fa-solid fa-map-location-dot mr-1 text-chinaRed"></i> View on Map
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterAttractions() {
+            renderAttractions();
+        }
+
+        // Render Hotels
+        function filterHotels(type) {
+            activeHotelFilter = type;
+            document.querySelectorAll('.hotel-filter-btn').forEach(btn => {
+                if (btn.dataset.filter === type) {
+                    btn.classList.add('bg-slate-900', 'text-white');
+                    btn.classList.remove('bg-slate-200', 'text-slate-700');
+                } else {
+                    btn.classList.remove('bg-slate-900', 'text-white');
+                    btn.classList.add('bg-slate-200', 'text-slate-700');
+                }
+            });
+            renderHotels();
+        }
+
+        function renderHotels() {
+            const data = cityDataStore[currentCityKey] || cityDataStore["Shanghai (The Bund)"];
+            const filtered = activeHotelFilter === 'all' ? data.hotels : data.hotels.filter(h => h.type === activeHotelFilter);
+            const grid = document.getElementById('hotelsGrid');
+
+            grid.innerHTML = filtered.map(hotel => `
+                <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between transition hover:shadow-md">
+                    <div>
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="${hotel.image}" alt="${hotel.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/1e293b/ffffff?text=Hotel'">
+                            <span class="absolute top-3 left-3 bg-amber-500 text-white text-xs font-semibold px-3 py-1 rounded-full">${hotel.type} Stay</span>
+                            <span class="absolute top-3 right-3 bg-slate-900/80 text-white text-xs font-bold px-3 py-1 rounded-full">${hotel.price}</span>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <h3 class="text-lg font-bold text-slate-900">${hotel.name}</h3>
+                            <p class="text-xs text-indigo-600 font-semibold"><i class="fa-solid fa-location-dot mr-1"></i> ${hotel.location}</p>
+                            <p class="text-xs text-slate-600"><strong class="text-slate-800">Amenities:</strong> ${hotel.amenities}</p>
+                            <p class="text-xs text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100"><strong class="text-slate-700">Best For:</strong> ${hotel.suitability}</p>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0">
+                        <button onclick="showToast('Redirecting to secure booking partner...')" class="block w-full text-center bg-chinaRed hover:bg-red-700 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm">
+                            <i class="fa-solid fa-bookmark mr-1"></i> Reserve Stay
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Food
+        function filterFood() {
+            renderFood();
+        }
+
+        function renderFood() {
+            const data = cityDataStore[currentCityKey] || cityDataStore["Shanghai (The Bund)"];
+            const dietary = document.getElementById('dietaryFilter').value;
+            const filtered = dietary === 'all' ? data.food : data.food.filter(f => f.dietary === dietary);
+            const grid = document.getElementById('foodGrid');
+
+            grid.innerHTML = filtered.map(item => `
+                <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 flex flex-col justify-between transition hover:shadow-md">
+                    <div>
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/1e293b/ffffff?text=Food'">
+                            <span class="absolute top-3 left-3 bg-emerald-600 text-white text-xs font-semibold px-3 py-1 rounded-full">${item.cuisine}</span>
+                            <span class="absolute top-3 right-3 bg-slate-900/80 text-white text-xs font-bold px-3 py-1 rounded-full">${item.cost}</span>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <h3 class="text-lg font-bold text-slate-900">${item.name}</h3>
+                            <p class="text-xs text-slate-600">${item.description}</p>
+                            <div class="bg-amber-50 p-3 rounded-xl border border-amber-100 text-xs text-amber-900">
+                                <strong>Signature Dish:</strong> ${item.dishes}
+                            </div>
+                            <div class="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
+                                <span><i class="fa-solid fa-location-arrow text-indigo-600 mr-1"></i> ${item.distance} away</span>
+                                <span class="uppercase font-semibold text-emerald-600">${item.dietary}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0">
+                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name + ' ' + currentCityKey)}" target="_blank" class="block w-full text-center bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2.5 rounded-xl text-xs transition">
+                            <i class="fa-solid fa-map-location-dot mr-1 text-chinaRed"></i> Locate Restaurant
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Phrases
+        function renderPhrases() {
+            const phrases = [
+                { chinese: "你好", pinyin: "Nǐ hǎo", english: "Hello" },
+                { chinese: "谢谢", pinyin: "Xièxie", english: "Thank you" },
+                { chinese: "多少钱？", pinyin: "Duōshǎo qián?", english: "How much is this?" },
+                { chinese: "这个很好吃", pinyin: "Zhège hěn hǎochī", english: "This is delicious" },
+                { chinese: "请问地铁站在哪？", pinyin: "Qǐngwèn dìtiě zhàn zài nǎ?", english: "Where is the metro station?" },
+                { chinese: "我不吃肉 / 素食", pinyin: "Wǒ bù chī ròu / sùshí", english: "I am vegetarian / No meat" },
+                { chinese: "买单", pinyin: "Mǎidān", english: "Bill / Check please" },
+                { chinese: "再见", pinyin: "Zàijiàn", english: "Goodbye" }
+            ];
+
+            const container = document.getElementById('phraseContainer');
+            container.innerHTML = phrases.map(p => `
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center space-y-1.5 hover:border-chinaRed transition">
+                    <h4 class="text-2xl font-bold text-slate-900">${p.chinese}</h4>
+                    <p class="text-xs font-semibold text-chinaRed">${p.pinyin}</p>
+                    <p class="text-xs text-slate-600">${p.english}</p>
+                </div>
+            `).join('');
+        }
+
+        // Toast Notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = message;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
